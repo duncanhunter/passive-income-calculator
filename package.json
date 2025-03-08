@@ -1,16 +1,25 @@
 {
   "name": "passive-income-goal-calculator",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A calculator for passive income goals",
+  "type": "module",
+  "main": "dist/forecast-calculator.js",
   "scripts": {
-    "start": "tsx index.ts"
+    "start": "npm run build && serve",
+    "dev": "npm run build -- --watch & serve -l 3000",
+    "build": "esbuild src/forecast-calculator.ts --bundle --outdir=dist --format=esm"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "big.js": "^6.2.2",
-    "tsx": "^4.19.3"
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/big.js": "^6.2.2",
+    "esbuild": "^0.19.11",
+    "serve": "^14.2.0"
   }
 }

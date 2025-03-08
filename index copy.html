@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Forecast with Clickable Chart</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <h1>Passive Income Forecaster</h1>
+
+  <!-- The chart -->
+  <div class="chart-container">
+    <canvas id="forecastChart" width="800" height="400"></canvas>
+  </div>
+
+  <!-- A side drawer for year details -->
+  <div id="sideDrawer" class="drawer hidden">
+    <button id="closeDrawerBtn">Close</button>
+    <div id="drawerContent"></div>
+  </div>
+
+  <!-- Load Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Load your forecast calculator (assumes ES Module) -->
+  <script type="module" src="/dist/forecast-calculator.js"></script>
+  <!-- Main app logic -->
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

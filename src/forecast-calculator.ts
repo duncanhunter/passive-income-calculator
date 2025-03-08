@@ -1,5 +1,5 @@
 import Big from "big.js";
-import { Profile, Result, Settings } from "./types";
+import { Profile, Result, Settings } from "./types.js";
 
 /**
  * A helper to convert a "percentage integer" (e.g. 5 for 5%) to decimal (0.05).
@@ -16,7 +16,8 @@ function getOrDefaultRate(
     assetValue: number | undefined,
     defaultPercentage: number
 ): number {
-    return assetValue != null ? assetValue : toDecimalRate(defaultPercentage);
+    const raw = assetValue != null ? assetValue : defaultPercentage;
+    return toDecimalRate(raw);
 }
 
 function getOrDefaultNumber(

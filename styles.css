@@ -1,0 +1,53 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 1rem;
+    background-color: #f9f9f9;
+  }
+  
+  .chart-container {
+    margin-bottom: 2rem;
+  }
+  
+  /* The side drawer */
+  .drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: -3px 0 5px rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    transform: translateX(100%);  /* hidden by default */
+    transition: transform 0.3s ease;
+    z-index: 9999;
+  }
+  .drawer.open {
+    transform: translateX(0);
+  }
+  .hidden {
+    display: none;
+  }
+  
+  /* Basic button styling */
+  button {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
