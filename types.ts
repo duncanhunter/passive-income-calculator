@@ -1,4 +1,3 @@
-
 export interface Profile {
     currentYear: number;
     yearsToGoal: number;
@@ -7,45 +6,30 @@ export interface Profile {
 }
 
 export interface Result {
+    currentYear: number;
     grossIncome: number;
     expenses: number;
     netIncome: number;
+    totalPrincipalPaid: number; // Added: total principal repayments across all assets
+    cashFlowAfterPrincipal: number; // Added: net income minus principal payments
     gapToIncomeGoal: number;
+    realGapToGoal: number; // Added: gap based on cash flow after principal
     numberOfAssets: number;
     assetValue: number;
     assetLoanBalance: number;
     equity: number;
+    assets: AssetYearBreakdown[];
 }
 
 export interface Settings {
-    /**
-     * Default annual capital growth rate (%). e.g. 5 => 5%.
-     * Will be converted to 0.05 in code.
-     */
     defaultCapitalGrowthRate: number;
-
-    /**
-     * Default annual expense growth rate (%). e.g. 3 => 3%.
-     * Will be converted to 0.03 in code.
-     */
     defaultExpenseGrowthRate: number;
-
-    /**
-     * Default loan-to-value ratio (%). e.g. 80 => 80%.
-     * Will be converted to 0.80 in code.
-     */
+    defaultIncomeGrowthRate: number;
     defaultLoanToValueRatio: number;
-
-    /**
-     * Default annual loan interest rate (%). e.g. 6 => 6%.
-     * Will be converted to 0.06 in code.
-     */
     defaultLoanInterestRate: number;
-
-    /**
-     * Default interest-only period (in years).
-     */
     defaultLoanInterestOnlyPeriod: number;
+    defaultLoanTermYears: number; // Added: default loan term (typically 30 years)
+    defaultPrincipalResidenceLoanTermYears: number; // Added: default loan term for PPOR (typically 20 years)
 }
 
 export interface Asset {
@@ -64,7 +48,7 @@ export interface Asset {
     expenseGrowthRate?: number;  // e.g. 0.02 => 2%
 
     // Purchase info
-    purchaseYear: string;        // e.g. "2025"
+    purchaseYear: number;        // e.g. "2025"
     purchaseMarketValue?: number; // e.g. 500000
 
     // Loan info
@@ -72,9 +56,18 @@ export interface Asset {
     loanToValueRatio?: number;   // e.g. 0.80
     loanInterestRate?: number;   // e.g. 0.06
     loanInterestOnlyPeriod?: number; // in years
+    loanTermYears?: number; // Added: optional custom loan term in years
 }
 
-export interface AssetForecast extends Asset {
-    currentValue: number;
-    currentYear: number;
+export interface AssetYearBreakdown {
+    name: string;
+    type: string;
+    grossIncome: number;
+    operatingExpenses: number;
+    interestPaid: number;
+    principalPaid: number;
+    netIncome: number;
+    cashFlowAfterPrincipal: number; // Added: net income minus principal payments
+    loanBalanceEnd: number;
+    assetValue: number;
 }
