@@ -1,53 +1,322 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 1rem;
-    background-color: #f9f9f9;
-  }
-  
-  .chart-container {
-    margin-bottom: 2rem;
-  }
-  
-  /* The side drawer */
-  .drawer {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 320px;
-    height: 100%;
-    background-color: #fff;
-    box-shadow: -3px 0 5px rgba(0, 0, 0, 0.2);
-    padding: 1rem;
-    transform: translateX(100%);  /* hidden by default */
-    transition: transform 0.3s ease;
-    z-index: 9999;
-  }
-  .drawer.open {
-    transform: translateX(0);
-  }
-  .hidden {
-    display: none;
-  }
-  
-  /* Basic button styling */
-  button {
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    margin-bottom: 1rem;
-  }
+  font-family: Arial, sans-serif;
+  margin: 0 auto;
+  padding: 0 10px;
+}
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-  th,
-  td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
+.chart-container {
+  width: 100%;
+  height: 60vh;
+  /* Use viewport height for better responsiveness */
+  margin: 20px 0;
+  position: relative;
+  box-sizing: border-box;
+}
 
-  th {
-    background-color: #f2f2f2;
-  }
+/* The side drawer */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 350px;
+  background-color: white;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-out;
+  z-index: 1000;
+}
+
+.drawer.open {
+  transform: translateX(0);
+}
+
+.drawer.hidden {
+  display: none;
+}
+
+.results table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.results th,
+.results td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  text-align: right;
+}
+
+.results th {
+  background-color: #f2f2f2;
+  text-align: center;
+}
+
+.results tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.results tr:hover {
+  background-color: #f2f2f2;
+}
+
+/* Form styling */
+.form-container {
+  margin-bottom: 30px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.form-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.asset-row {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.asset-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.asset-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.btn {
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #45a049;
+}
+
+.remove-asset-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.remove-asset-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* Modal for share link */
+.modal {
+  display: flex;
+  position: fixed;
+  z-index: 1001;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 500px;
+  max-width: 90%;
+  position: relative;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.share-link-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.share-link-container input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.share-link-container button {
+  padding: 8px 16px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.share-link-container button:hover {
+  background-color: #0b7dda;
+}
+
+/* Excel-like assets table styling */
+.assets-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.assets-table th {
+  background-color: #e6e6e6;
+  border: 1px solid #ccc;
+  padding: 8px 4px;
+  text-align: center;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.assets-table td {
+  border: 1px solid #ddd;
+  padding: 4px;
+}
+
+.assets-table input,
+.assets-table select {
+  width: 100%;
+  padding: 4px;
+  border: none;
+  background-color: transparent;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.assets-table input:focus,
+.assets-table select:focus {
+  outline: 2px solid #4CAF50;
+}
+
+.asset-actions {
+  white-space: nowrap;
+  width: 110px;
+}
+
+.toggle-asset-btn,
+.remove-asset-btn {
+  padding: 3px 5px;
+  font-size: 12px;
+  margin: 0 2px;
+  cursor: pointer;
+  border-radius: 3px;
+  border: none;
+}
+
+.toggle-asset-btn {
+  background-color: #2196F3;
+  color: white;
+}
+
+.toggle-asset-btn:hover {
+  background-color: #0b7dda;
+}
+
+.hidden-asset {
+  opacity: 0.5;
+  background-color: #f1f1f1;
+}
+
+/* Forecast Results Details styling */
+.forecast-details {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin: 20px 0;
+}
+
+.forecast-details summary {
+  padding: 10px 15px;
+  cursor: pointer;
+  user-select: none;
+  background-color: #f2f2f2;
+  border-radius: 5px;
+  position: relative;
+}
+
+.forecast-details summary h2 {
+  display: inline;
+  margin: 0;
+  font-size: 1.2em;
+}
+
+
+.details-hint {
+  font-size: 0.7em;
+  font-weight: normal;
+  color: #666;
+  margin-left: 10px;
+}
+
+.details-content {
+  padding: 15px;
+  overflow-x: auto;
+}

@@ -12,15 +12,47 @@
 
 <body>
   <h1>Passive Income Calculator</h1>
+
+  <!-- Chart container - remove fixed dimensions -->
   <div class="chart-container">
-    <canvas id="forecastChart" width="800" height="400"></canvas>
+    <canvas id="forecastChart"></canvas>
   </div>
+
+  <!-- Form for assets management -->
+  <div class="form-container">
+    <div class="form-header">
+      <h2>Assets</h2>
+      <div class="form-controls">
+        <button id="addAssetBtn" class="btn">Add Asset</button>
+        <button id="generateShareLink" class="btn">Share</button>
+      </div>
+    </div>
+
+    <div id="assetsForm">
+      <!-- Assets table will be dynamically added here -->
+    </div>
+  </div>
+
   <div id="sideDrawer" class="drawer hidden">
     <button id="closeDrawerBtn">Close</button>
     <div id="drawerContent"></div>
   </div>
+
   <div id="calculator">
     <div id="results" class="results"></div>
+  </div>
+
+  <!-- Share link modal -->
+  <div id="shareModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h3>Share Your Calculation</h3>
+      <p>Copy this link to share your asset calculation:</p>
+      <div class="share-link-container">
+        <input id="shareLinkInput" type="text" readonly>
+        <button id="copyLinkBtn">Copy</button>
+      </div>
+    </div>
   </div>
 </body>
 
