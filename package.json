@@ -7,14 +7,12 @@
   "homepage": "https://duncanhunter.github.io/passive-income-calculator",
   "scripts": {
     "start": "serve",
-    "dev": "serve -l 3000",
-    "build": "tsc"
+    "build": "tsc --declaration false --sourceMap false"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "big.js": "^6.2.2",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2"
   },

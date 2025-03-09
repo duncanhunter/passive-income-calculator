@@ -1,5 +1,6 @@
-import Big from "big.js";
+// Import only the types, not the Big implementation
 import { Profile, Result, Settings } from "./types.js";
+// import Big from "big.js";
 
 /**
  * A helper to convert a "percentage integer" (e.g. 5 for 5%) to decimal (0.05).
@@ -37,10 +38,10 @@ function getOrDefaultNumber(
  *          If annualInterest=0 => principal/yearsOfRepayment
  */
 function computeAnnualPiPayment(
-    principal: Big,
-    annualInterest: Big,
+    principal: ReturnType<typeof Big>,
+    annualInterest: ReturnType<typeof Big>,
     yearsOfRepayment: number
-): Big {
+): ReturnType<typeof Big> {
     if (yearsOfRepayment <= 0) {
         // no years to repay => treat as zero or immediate
         return Big(0);
