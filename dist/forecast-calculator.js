@@ -542,7 +542,11 @@ function calculateForecast(profile, settings) {
       ...asset,
       _purchaseYear: parsedPurchaseYear,
       capitalGrowthRate,
-      incomePerWeek: getOrDefaultNumber(asset.incomePerWeek, 0),
+      // Support both incomePerYear and incomePerWeek for backwards compatibility
+      incomePerYear: getOrDefaultNumber(
+        asset.incomePerYear || (asset.incomePerWeek ? asset.incomePerWeek * 52 : void 0),
+        0
+      ),
       incomeGrowthRate,
       expensesPerYear: getOrDefaultNumber(asset.expensesPerYear, 0),
       expenseGrowthRate,
@@ -579,9 +583,10 @@ function calculateForecast(profile, settings) {
       // fixed P+I payment once IO ends
     };
   });
+  const startYear = profile.startYear || profile.currentYear;
   const results = [];
   for (let yearOffset = 0; yearOffset < 50; yearOffset++) {
-    const forecastYear = profile.currentYear + yearOffset;
+    const forecastYear = startYear + yearOffset;
     let totalGrossIncome = big_default(0);
     let totalExpenses = big_default(0);
     let totalAssetValue = big_default(0);
@@ -597,7 +602,7 @@ function calculateForecast(profile, settings) {
       const currentValue = big_default(asset.purchaseMarketValue).times(
         big_default(1).plus(asset.capitalGrowthRate).pow(Math.max(0, yearsHeld))
       );
-      const baseAnnualIncome = big_default(asset.incomePerWeek).times(52);
+      const baseAnnualIncome = big_default(asset.incomePerYear);
       const grownAnnualIncome = baseAnnualIncome.times(
         big_default(1).plus(asset.incomeGrowthRate).pow(Math.max(0, yearsHeld))
       );

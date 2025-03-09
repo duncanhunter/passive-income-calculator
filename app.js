@@ -2,7 +2,7 @@ import { calculateForecast } from './dist/forecast-calculator.js';
 
 // Default settings
 const settings = {
-  defaultCapitalGrowthRate: 3,
+  defaultCapitalGrowthRate: 5,
   defaultIncomeGrowthRate: 2,
   defaultExpenseGrowthRate: 2,
   defaultLoanToValueRatio: 0.8,
@@ -24,7 +24,7 @@ const defaultAssets = [
   {
     name: "Investment Property 1",
     type: "investmentProperty",
-    purchaseYear: 2017,
+    purchaseYear: 2025,
     purchaseMarketValue: 850000,
     incomePerYear: 800 * 52,
     expensesPerYear: 5000,
@@ -34,7 +34,7 @@ const defaultAssets = [
   {
     name: "Investment Property 2",
     type: "investmentProperty",
-    purchaseYear: 2017,
+    purchaseYear: 2026,
     purchaseMarketValue: 850000,
     incomePerYear: 800 * 52,
     expensesPerYear: 5000,
@@ -44,31 +44,11 @@ const defaultAssets = [
   {
     name: "Investment Property 3",
     type: "investmentProperty",
-    purchaseYear: 2020,
+    purchaseYear: 2027,
     purchaseMarketValue: 850000,
     incomePerYear: 800 * 52,
     expensesPerYear: 5000,
     loanAmount: 700000,
-    loanInterestOnlyPeriod: 3,
-  },
-  {
-    name: "Investment Property 4",
-    type: "investmentProperty",
-    purchaseYear: 2022,
-    purchaseMarketValue: 850000,
-    incomePerYear: 800 * 52,
-    expensesPerYear: 5000,
-    loanAmount: 700000,
-    loanInterestOnlyPeriod: 3,
-  },
-  {
-    name: "Investment Property 5",
-    type: "investmentProperty",
-    purchaseYear: 2026,
-    purchaseMarketValue: 1500000,
-    incomePerYear: 1400 * 52,
-    expensesPerYear: 10000,
-    loanAmount: 1300000,
     loanInterestOnlyPeriod: 3,
   },
   {
@@ -81,34 +61,39 @@ const defaultAssets = [
     loanAmount: 700000,
     loanInterestOnlyPeriod: 3,
     capitalGrowthRate: 4,
+    loanInterestRate: 7
   },
   {
     name: "Self Managed Super Fund",
     type: "selfManagedSuperFund",
-    purchaseYear: 2024,
+    purchaseYear: 2028,
     purchaseMarketValue: 1000000,
     incomePerYear: 900 * 52,
     expensesPerYear: 5000,
     loanAmount: 700000,
     loanInterestOnlyPeriod: 3,
+    loanInterestRate: 7
   },
   {
     name: "Stock Portfolio",
     type: "stockPortfolio",
-    purchaseYear: 2027,
+    purchaseYear: 2025,
     purchaseMarketValue: 200000,
-    incomePerYear: 200 * 52,
-    expensesPerYear: 200,
+    incomePerYear: 20000,
+    expensesPerYear: 1000,
     loanAmount: 0,
+    loanInterestOnlyPeriod: 0,
+    loanInterestRate: 0,
+    loanTermYears: 0,
   },
   {
     name: "Principal Place of Residence",
     type: "principalPlaceOfResidence",
     purchaseYear: 2025,
-    purchaseMarketValue: 600000,
+    purchaseMarketValue: 1000000,
     incomePerYear: 0,
-    expensesPerYear: 3000,
-    loanAmount: 450000,
+    expensesPerYear: 5000,
+    loanAmount: 600000,
   },
 ];
 
@@ -193,9 +178,19 @@ function renderAssetForm() {
 
   const assetsTableBody = document.getElementById('assetsTableBody');
 
-  // Add a row for each asset
-  profile.assets.forEach((asset, index) => {
-    addAssetTableRow(asset, index, assetsTableBody);
+  // Create a copy of the assets array and sort by purchase year
+  const sortedAssets = [...profile.assets].sort((a, b) => {
+    // Convert to numbers for reliable comparison
+    const yearA = parseInt(a.purchaseYear) || 0;
+    const yearB = parseInt(b.purchaseYear) || 0;
+    return yearA - yearB; // Sort low to high
+  });
+
+  // Add a row for each asset using the sorted array
+  sortedAssets.forEach((asset, sortedIndex) => {
+    // Find the original index in profile.assets to maintain data integrity
+    const originalIndex = profile.assets.findIndex(a => a === asset);
+    addAssetTableRow(asset, originalIndex, assetsTableBody);
   });
 }
 
@@ -630,7 +625,7 @@ function recalculateAndUpdate() {
 
     // Find the earliest purchase year for historical data
     const earliestYear = getEarliestPurchaseYear();
-    
+
     // Create a modified profile with the earliest year as the start year
     // This ensures calculation begins from the earliest purchase year
     const calculationProfile = {
@@ -649,7 +644,7 @@ function recalculateAndUpdate() {
 
     // Update the chart with filtered results (current year onward)
     updateChart(currentYearResults);
-    
+
     // Update the table with full historical results
     updateResultsTable(results);
   } catch (error) {
