@@ -214,6 +214,19 @@ function renderAssetForm() {
   document.getElementById('yearsToGoalInput').addEventListener('change', handleProfileChange);
   document.getElementById('chartYearsFilter').addEventListener('change', handleProfileChange);
 
+  // Re-assign DOM references to the dynamically created buttons
+  const addAssetButton = document.getElementById('addAssetBtn');
+  const generateShareLinkButton = document.getElementById('generateShareLink');
+
+  // Add event listeners to the buttons
+  if (addAssetButton) {
+    addAssetButton.addEventListener('click', addAsset);
+  }
+
+  if (generateShareLinkButton) {
+    generateShareLinkButton.addEventListener('click', showShareLink);
+  }
+
   // Create a copy of the assets array and sort by purchase year
   const sortedAssets = [...profile.assets].sort((a, b) => {
     // Convert to numbers for reliable comparison
@@ -875,16 +888,13 @@ function copyShareLink() {
  * Set up all event listeners
  */
 function setupEventListeners() {
-  // Add asset button
-  addAssetBtn.addEventListener('click', addAsset);
+  // Remove event listeners for buttons that are now dynamically created
+  // (they're handled in renderAssetForm instead)
 
   // Close drawer button
   closeDrawerBtn.addEventListener('click', () => {
     sideDrawer.classList.remove("open");
   });
-
-  // Generate share link button
-  generateShareLink.addEventListener('click', showShareLink);
 
   // Copy link button
   copyLinkBtn.addEventListener('click', copyShareLink);
