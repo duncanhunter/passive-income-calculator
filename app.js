@@ -16,6 +16,8 @@ const settings = {
 let profile = {
   currentYear: 2025,
   passiveIncomeGoal: 200000,
+  yearsToGoal: 15,  // Default years to goal
+  chartYears: 30,   // Default to 5 years past yearsToGoal
   assets: []
 };
 
@@ -151,6 +153,34 @@ function initializeApp() {
 function renderAssetForm() {
   // Create a table structure for Excel-like layout
   assetsForm.innerHTML = `
+    <div class="profile-controls">
+      <div class="profile-form">
+        <div class="form-field">
+          <label for="currentYearInput">Current Year:</label>
+          <input type="number" id="currentYearInput" value="${profile.currentYear}">
+        </div>
+        <div class="form-field">
+          <label for="passiveIncomeGoalInput">Income Goal ($):</label>
+          <input type="number" id="passiveIncomeGoalInput" value="${profile.passiveIncomeGoal}">
+        </div>
+        <div class="form-field">
+          <label for="yearsToGoalInput">Years to Goal:</label>
+          <input type="number" id="yearsToGoalInput" value="${profile.yearsToGoal || 10}">
+        </div>
+        <div class="form-field">
+          <label for="chartYearsFilter">Chart Years:</label>
+          <select id="chartYearsFilter">
+            ${[5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map(years =>
+    `<option value="${years}" ${years === (profile.chartYears || 15) ? 'selected' : ''}>${years}</option>`
+  ).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-controls">
+        <button id="addAssetBtn" class="btn">Add Asset</button>
+        <button id="generateShareLink" class="btn">Share</button>
+      </div>
+    </div>
     <table class="assets-table">
       <thead>
         <tr>
@@ -178,6 +208,12 @@ function renderAssetForm() {
 
   const assetsTableBody = document.getElementById('assetsTableBody');
 
+  // Add event listeners for profile inputs
+  document.getElementById('currentYearInput').addEventListener('change', handleProfileChange);
+  document.getElementById('passiveIncomeGoalInput').addEventListener('change', handleProfileChange);
+  document.getElementById('yearsToGoalInput').addEventListener('change', handleProfileChange);
+  document.getElementById('chartYearsFilter').addEventListener('change', handleProfileChange);
+
   // Create a copy of the assets array and sort by purchase year
   const sortedAssets = [...profile.assets].sort((a, b) => {
     // Convert to numbers for reliable comparison
@@ -192,6 +228,45 @@ function renderAssetForm() {
     const originalIndex = profile.assets.findIndex(a => a === asset);
     addAssetTableRow(asset, originalIndex, assetsTableBody);
   });
+}
+
+/**
+ * Handle changes to profile inputs
+ */
+function handleProfileChange(event) {
+  const input = event.target;
+  const value = input.type === 'number' ? parseInt(input.value) : input.value;
+
+  switch (input.id) {
+    case 'currentYearInput':
+      profile.currentYear = value;
+      break;
+    case 'passiveIncomeGoalInput':
+      profile.passiveIncomeGoal = value;
+      break;
+    case 'yearsToGoalInput':
+      profile.yearsToGoal = value;
+      // Update chart years to yearsToGoal + 5 as default
+      if (!profile.chartYears) {
+        profile.chartYears = value + 5;
+        const chartYearsFilter = document.getElementById('chartYearsFilter');
+        if (chartYearsFilter) {
+          // Find the closest available option
+          const options = Array.from(chartYearsFilter.options).map(opt => parseInt(opt.value));
+          const closest = options.reduce((prev, curr) =>
+            (Math.abs(curr - profile.chartYears) < Math.abs(prev - profile.chartYears) ? curr : prev)
+          );
+          chartYearsFilter.value = closest;
+        }
+      }
+      break;
+    case 'chartYearsFilter':
+      profile.chartYears = parseInt(input.value);
+      break;
+  }
+
+  recalculateAndUpdate();
+  updateUrlState();
 }
 
 /**
@@ -425,10 +500,14 @@ function toggleAssetVisibility(index) {
  * Updates the chart with the latest forecast data.
  */
 function updateChart(forecastResults) {
-  const labels = forecastResults.map(r => r.currentYear.toString());
-  const debtData = forecastResults.map(r => r.assetLoanBalance);
-  const equityData = forecastResults.map(r => r.assetValue - r.assetLoanBalance);
-  const cashflowData = forecastResults.map(r => r.cashFlowAfterPrincipal);
+  // If chartYears is set, limit the data points
+  const yearsToShow = profile.chartYears || 15;
+  const limitedResults = forecastResults.slice(0, yearsToShow);
+
+  const labels = limitedResults.map(r => r.currentYear.toString());
+  const debtData = limitedResults.map(r => r.assetLoanBalance);
+  const equityData = limitedResults.map(r => r.assetValue - r.assetLoanBalance);
+  const cashflowData = limitedResults.map(r => r.cashFlowAfterPrincipal);
 
   // Destroy existing chart if any
   if (forecastChart) {
@@ -657,6 +736,14 @@ function recalculateAndUpdate() {
  */
 function updateResultsTable(results) {
   const resultsDiv = document.getElementById('results');
+
+  // Find index for yearsToGoal if defined
+  const targetYear = profile.currentYear + (profile.yearsToGoal || 10);
+  const targetYearIndex = results.findIndex(r => r.currentYear >= targetYear);
+
+  // Default to showing the first 30 years
+  const yearsToShow = targetYearIndex > 0 ? targetYearIndex + 5 : 30;
+
   resultsDiv.innerHTML = `
     <details class="forecast-details">
       <summary>
@@ -675,7 +762,7 @@ function updateResultsTable(results) {
             </tr>
           </thead>
           <tbody>
-            ${results.slice(0, 30).map(year => `
+            ${results.slice(0, yearsToShow).map(year => `
               <tr>
                 <td>${year.currentYear}</td>
                 <td>$${Math.round(year.expenses).toLocaleString()}</td>
@@ -711,10 +798,12 @@ function updateUrlState() {
       return minAsset;
     });
 
-    // Create state object with current year and assets
+    // Create state object with all profile properties and assets
     const state = {
       cy: profile.currentYear,
       pig: profile.passiveIncomeGoal,
+      ytg: profile.yearsToGoal,
+      chy: profile.chartYears,
       a: minimalAssets
     };
 
@@ -748,6 +837,8 @@ function loadStateFromUrl() {
     // Update profile with loaded state
     if (state.cy) profile.currentYear = Number(state.cy);
     if (state.pig) profile.passiveIncomeGoal = Number(state.pig);
+    if (state.ytg) profile.yearsToGoal = Number(state.ytg);
+    if (state.chy) profile.chartYears = Number(state.chy);
     if (state.a && Array.isArray(state.a)) {
       profile.assets = state.a;
     }

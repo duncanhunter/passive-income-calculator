@@ -12,7 +12,9 @@ h1 {
 .chart-container {
   width: 100%;
   height: 60vh;
-  /* Use viewport height for better responsiveness */
+  /* Use viewport height for responsiveness on smaller screens */
+  max-height: 400px;
+  /* Cap the maximum height at 400px */
   margin: 20px 0;
   position: relative;
   box-sizing: border-box;
@@ -364,4 +366,46 @@ h1 {
 .details-content {
   padding: 15px;
   overflow-x: auto;
+}
+
+/* Profile controls styling */
+.profile-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+}
+
+.profile-form {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.form-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-field label {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.form-field input,
+.form-field select {
+  width: 100px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  outline: 2px solid #4CAF50;
+  border-color: #4CAF50;
 }
