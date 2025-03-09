@@ -3,6 +3,8 @@ export interface Profile {
     yearsToGoal: number;
     passiveIncomeGoal: number;
     assets: Asset[];
+    calculationStartYear?: number; // For backward compatibility 
+    startYear?: number; // New property for earliest calculation year
 }
 
 export interface Result {

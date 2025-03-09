@@ -68,7 +68,7 @@ function computeAnnualPiPayment(
 
 /**
  * Main forecast calculation:
- * - Iterates year by year from 0..(profile.yearsToGoal-1)
+ * - Iterates year by year from startYear (earliest purchase) up to startYear+49
  * - Tracks each asset's loan balance so that:
  *    1. For years <= interestOnlyPeriod: interest-only payments.
  *    2. After interestOnlyPeriod: principal+interest amortization over remaining term (based on asset type).
@@ -121,7 +121,11 @@ export function calculateForecast(
             ...asset,
             _purchaseYear: parsedPurchaseYear,
             capitalGrowthRate,
-            incomePerWeek: getOrDefaultNumber(asset.incomePerWeek, 0),
+            // Support both incomePerYear and incomePerWeek for backwards compatibility
+            incomePerYear: getOrDefaultNumber(
+                asset.incomePerYear || (asset.incomePerWeek ? asset.incomePerWeek * 52 : undefined),
+                0
+            ),
             incomeGrowthRate,
             expensesPerYear: getOrDefaultNumber(asset.expensesPerYear, 0),
             expenseGrowthRate,
@@ -164,12 +168,16 @@ export function calculateForecast(
         };
     });
 
-    // We'll accumulate year-by-year results into this array:
+    // Use the provided startYear if available, otherwise use currentYear
+    // This allows us to calculate from the earliest purchase year
+    const startYear = profile.startYear || profile.currentYear;
+
+    // Create results array
     const results: Result[] = [];
 
-    // 4) Forecast loop from `profile.currentYear` up to `profile.currentYear + 49` (50 years total)
+    // 4) Forecast loop from startYear up to startYear + 49 (50 years total)
     for (let yearOffset = 0; yearOffset < 50; yearOffset++) {
-        const forecastYear = profile.currentYear + yearOffset;
+        const forecastYear = startYear + yearOffset;
 
         // Per-year totals (across all assets)
         let totalGrossIncome = Big(0);
@@ -211,8 +219,8 @@ export function calculateForecast(
             );
 
             // 4.2 Income (annual)
-            // annualIncome = (incomePerWeek * 52) * (1 + incomeGrowthRate)^yearsHeld
-            const baseAnnualIncome = Big(asset.incomePerWeek!).times(52);
+            // Just use the annual income directly instead of calculating from weekly
+            const baseAnnualIncome = Big(asset.incomePerYear!);
             const grownAnnualIncome = baseAnnualIncome.times(
                 Big(1).plus(asset.incomeGrowthRate!).pow(Math.max(0, yearsHeld))
             );

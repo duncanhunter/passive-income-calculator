@@ -26,7 +26,7 @@ const defaultAssets = [
     type: "investmentProperty",
     purchaseYear: 2017,
     purchaseMarketValue: 850000,
-    incomePerWeek: 800,
+    incomePerYear: 800 * 52,
     expensesPerYear: 5000,
     loanAmount: 700000,
     loanInterestOnlyPeriod: 3,
@@ -36,7 +36,7 @@ const defaultAssets = [
     type: "investmentProperty",
     purchaseYear: 2017,
     purchaseMarketValue: 850000,
-    incomePerWeek: 800,
+    incomePerYear: 800 * 52,
     expensesPerYear: 5000,
     loanAmount: 700000,
     loanInterestOnlyPeriod: 3,
@@ -46,7 +46,7 @@ const defaultAssets = [
     type: "investmentProperty",
     purchaseYear: 2020,
     purchaseMarketValue: 850000,
-    incomePerWeek: 800,
+    incomePerYear: 800 * 52,
     expensesPerYear: 5000,
     loanAmount: 700000,
     loanInterestOnlyPeriod: 3,
@@ -56,7 +56,7 @@ const defaultAssets = [
     type: "investmentProperty",
     purchaseYear: 2022,
     purchaseMarketValue: 850000,
-    incomePerWeek: 800,
+    incomePerYear: 800 * 52,
     expensesPerYear: 5000,
     loanAmount: 700000,
     loanInterestOnlyPeriod: 3,
@@ -66,7 +66,7 @@ const defaultAssets = [
     type: "investmentProperty",
     purchaseYear: 2026,
     purchaseMarketValue: 1500000,
-    incomePerWeek: 1400,
+    incomePerYear: 1400 * 52,
     expensesPerYear: 10000,
     loanAmount: 1300000,
     loanInterestOnlyPeriod: 3,
@@ -76,7 +76,7 @@ const defaultAssets = [
     type: "commercialProperty",
     purchaseYear: 2028,
     purchaseMarketValue: 1000000,
-    incomePerWeek: 800,
+    incomePerYear: 800 * 52,
     expensesPerYear: 10000,
     loanAmount: 700000,
     loanInterestOnlyPeriod: 3,
@@ -87,7 +87,7 @@ const defaultAssets = [
     type: "selfManagedSuperFund",
     purchaseYear: 2024,
     purchaseMarketValue: 1000000,
-    incomePerWeek: 900,
+    incomePerYear: 900 * 52,
     expensesPerYear: 5000,
     loanAmount: 700000,
     loanInterestOnlyPeriod: 3,
@@ -97,7 +97,7 @@ const defaultAssets = [
     type: "stockPortfolio",
     purchaseYear: 2027,
     purchaseMarketValue: 200000,
-    incomePerWeek: 200,
+    incomePerYear: 200 * 52,
     expensesPerYear: 200,
     loanAmount: 0,
   },
@@ -106,7 +106,7 @@ const defaultAssets = [
     type: "principalPlaceOfResidence",
     purchaseYear: 2025,
     purchaseMarketValue: 600000,
-    incomePerWeek: 0,
+    incomePerYear: 0,
     expensesPerYear: 3000,
     loanAmount: 450000,
   },
@@ -134,7 +134,8 @@ const assetTypes = [
   "commercialProperty",
   "selfManagedSuperFund",
   "stockPortfolio",
-  "principalPlaceOfResidence"
+  "principalPlaceOfResidence",
+  "crypto"
 ];
 
 /**
@@ -171,12 +172,16 @@ function renderAssetForm() {
           <th>Name</th>
           <th>Type</th>
           <th>Purchase Year</th>
-          <th>Market Value</th>
-          <th>Weekly Income</th>
+          <th>Purchase Value</th>
+          <th>Annual Income</th>
           <th>Annual Expenses</th>
-          <th>Loan Amount</th>
-          <th>IO Period</th>
-          <th>Growth Rate (%)</th>
+          <th class="loan-header">Loan Amount</th>
+          <th class="loan-header">Interest Rate (%)</th>
+          <th class="loan-header">IO Period (Years)</th>
+          <th class="loan-header">Loan Term (Years)</th>
+          <th class="growth-header">Capital Growth (%)</th>
+          <th class="growth-header">Income Growth (%)</th>
+          <th class="growth-header">Expense Growth (%)</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -195,12 +200,49 @@ function renderAssetForm() {
 }
 
 /**
+ * Convert a camelCase string to sentence case
+ */
+function toSentenceCase(camelCaseString) {
+  // First, split the camel case string at capital letters
+  const words = camelCaseString.replace(/([A-Z])/g, ' $1').trim();
+  // Then capitalize the first letter
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/**
  * Creates a table row for an asset
  */
 function addAssetTableRow(asset = {}, index, tableBody) {
   const assetRow = document.createElement('tr');
   assetRow.className = asset.hidden ? 'asset-row hidden-asset' : 'asset-row';
   assetRow.dataset.index = index;
+
+  // Helper function to get default loan term based on asset type
+  const getDefaultLoanTerm = (assetType) => {
+    return assetType === "principalPlaceOfResidence"
+      ? settings.defaultPrincipalResidenceLoanTermYears
+      : settings.defaultLoanTermYears;
+  };
+
+  // Helper function to display 0 instead of empty string for numeric fields
+  const getNumericDisplay = (value) => {
+    return value !== undefined && value !== null && value !== '' ? value : 0;
+  };
+
+  // Get values or appropriate defaults
+  const loanInterestRate = asset.loanInterestRate !== undefined ? asset.loanInterestRate : settings.defaultLoanInterestRate;
+  const loanInterestOnlyPeriod = asset.loanInterestOnlyPeriod !== undefined ? asset.loanInterestOnlyPeriod : settings.defaultLoanInterestOnlyPeriod;
+  const loanTermYears = asset.loanTermYears !== undefined ? asset.loanTermYears : getDefaultLoanTerm(asset.type);
+  const capitalGrowthRate = asset.capitalGrowthRate !== undefined ? asset.capitalGrowthRate : settings.defaultCapitalGrowthRate;
+  const incomeGrowthRate = asset.incomeGrowthRate !== undefined ? asset.incomeGrowthRate : settings.defaultIncomeGrowthRate;
+  const expenseGrowthRate = asset.expenseGrowthRate !== undefined ? asset.expenseGrowthRate : settings.defaultExpenseGrowthRate;
+
+  // If asset has incomePerWeek but not incomePerYear, convert it
+  // This is for backward compatibility with older data
+  let incomePerYear = asset.incomePerYear;
+  if (!incomePerYear && asset.incomePerWeek) {
+    incomePerYear = asset.incomePerWeek * 52;
+  }
 
   // Create HTML for the table row with all asset fields
   assetRow.innerHTML = `
@@ -209,29 +251,41 @@ function addAssetTableRow(asset = {}, index, tableBody) {
     </td>
     <td>
       <select name="type" data-field="type">
-        ${assetTypes.map(type => `<option value="${type}" ${asset.type === type ? 'selected' : ''}>${type}</option>`).join('')}
+        ${assetTypes.map(type => `<option value="${type}" ${asset.type === type ? 'selected' : ''}>${toSentenceCase(type)}</option>`).join('')}
       </select>
     </td>
     <td>
-      <input type="number" name="purchaseYear" value="${asset.purchaseYear || ''}" data-field="purchaseYear">
+      <input type="number" name="purchaseYear" value="${getNumericDisplay(asset.purchaseYear)}" data-field="purchaseYear">
     </td>
     <td>
-      <input type="number" name="purchaseMarketValue" value="${asset.purchaseMarketValue || ''}" data-field="purchaseMarketValue">
+      <input type="number" name="purchaseMarketValue" value="${getNumericDisplay(asset.purchaseMarketValue)}" data-field="purchaseMarketValue">
     </td>
     <td>
-      <input type="number" name="incomePerWeek" value="${asset.incomePerWeek || ''}" data-field="incomePerWeek">
+      <input type="number" name="incomePerYear" value="${getNumericDisplay(incomePerYear)}" data-field="incomePerYear">
     </td>
     <td>
-      <input type="number" name="expensesPerYear" value="${asset.expensesPerYear || ''}" data-field="expensesPerYear">
+      <input type="number" name="expensesPerYear" value="${getNumericDisplay(asset.expensesPerYear)}" data-field="expensesPerYear">
     </td>
-    <td>
-      <input type="number" name="loanAmount" value="${asset.loanAmount || ''}" data-field="loanAmount">
+    <td class="loan-cell">
+      <input type="number" name="loanAmount" value="${getNumericDisplay(asset.loanAmount)}" data-field="loanAmount">
     </td>
-    <td>
-      <input type="number" name="loanInterestOnlyPeriod" value="${asset.loanInterestOnlyPeriod || ''}" data-field="loanInterestOnlyPeriod">
+    <td class="loan-cell">
+      <input type="number" name="loanInterestRate" value="${getNumericDisplay(loanInterestRate)}" data-field="loanInterestRate" step="0.01" placeholder="${settings.defaultLoanInterestRate}">
     </td>
-    <td>
-      <input type="number" name="capitalGrowthRate" value="${asset.capitalGrowthRate || ''}" data-field="capitalGrowthRate" step="0.1">
+    <td class="loan-cell">
+      <input type="number" name="loanInterestOnlyPeriod" value="${getNumericDisplay(loanInterestOnlyPeriod)}" data-field="loanInterestOnlyPeriod" placeholder="${settings.defaultLoanInterestOnlyPeriod}">
+    </td>
+    <td class="loan-cell">
+      <input type="number" name="loanTermYears" value="${getNumericDisplay(loanTermYears)}" data-field="loanTermYears" placeholder="${getDefaultLoanTerm(asset.type)}">
+    </td>
+    <td class="growth-cell">
+      <input type="number" name="capitalGrowthRate" value="${getNumericDisplay(capitalGrowthRate)}" data-field="capitalGrowthRate" step="0.1" placeholder="${settings.defaultCapitalGrowthRate}">
+    </td>
+    <td class="growth-cell">
+      <input type="number" name="incomeGrowthRate" value="${getNumericDisplay(incomeGrowthRate)}" data-field="incomeGrowthRate" step="0.1" placeholder="${settings.defaultIncomeGrowthRate}">
+    </td>
+    <td class="growth-cell">
+      <input type="number" name="expenseGrowthRate" value="${getNumericDisplay(expenseGrowthRate)}" data-field="expenseGrowthRate" step="0.1" placeholder="${settings.defaultExpenseGrowthRate}">
     </td>
     <td class="asset-actions">
       <button class="toggle-asset-btn" title="${asset.hidden ? 'Show asset' : 'Hide asset'}" data-index="${index}">
@@ -246,6 +300,21 @@ function addAssetTableRow(asset = {}, index, tableBody) {
   // Add event listeners to inputs and select
   assetRow.querySelectorAll('input, select').forEach(input => {
     input.addEventListener('change', handleAssetInputChange);
+  });
+
+  // Add event listener to update loan term when asset type changes
+  const typeSelect = assetRow.querySelector('select[data-field="type"]');
+  typeSelect.addEventListener('change', (e) => {
+    const loanTermInput = assetRow.querySelector('input[data-field="loanTermYears"]');
+    // Only update if the user hasn't explicitly set a value
+    if (!asset.loanTermYears) {
+      const newType = e.target.value;
+      const defaultTerm = getDefaultLoanTerm(newType);
+      loanTermInput.value = defaultTerm;
+      loanTermInput.placeholder = defaultTerm;
+      // Trigger change event to update the asset
+      loanTermInput.dispatchEvent(new Event('change'));
+    }
   });
 
   // Add the row to the table body
@@ -298,10 +367,15 @@ function addAsset() {
     type: "investmentProperty",
     purchaseYear: new Date().getFullYear(),
     purchaseMarketValue: 0,
-    incomePerWeek: 0,
+    incomePerYear: 0,  // Changed from incomePerWeek
     expensesPerYear: 0,
     loanAmount: 0,
+    loanInterestRate: settings.defaultLoanInterestRate,
     loanInterestOnlyPeriod: settings.defaultLoanInterestOnlyPeriod,
+    loanTermYears: settings.defaultLoanTermYears,
+    capitalGrowthRate: settings.defaultCapitalGrowthRate,
+    incomeGrowthRate: settings.defaultIncomeGrowthRate,
+    expenseGrowthRate: settings.defaultExpenseGrowthRate,
     hidden: false
   };
 
@@ -534,6 +608,17 @@ function showYearDetail(index) {
 }
 
 /**
+ * Find the earliest purchase year among all assets
+ */
+function getEarliestPurchaseYear() {
+  const purchaseYears = profile.assets
+    .filter(asset => !asset.hidden && isAssetValid(asset))
+    .map(asset => asset.purchaseYear)
+    .filter(Boolean);
+  return purchaseYears.length > 0 ? Math.min(...purchaseYears) : profile.currentYear;
+}
+
+/**
  * Recalculate forecast and update the UI
  */
 function recalculateAndUpdate() {
@@ -543,17 +628,29 @@ function recalculateAndUpdate() {
       isAssetValid(asset) && !asset.hidden
     );
 
+    // Find the earliest purchase year for historical data
+    const earliestYear = getEarliestPurchaseYear();
+    
+    // Create a modified profile with the earliest year as the start year
+    // This ensures calculation begins from the earliest purchase year
     const calculationProfile = {
       ...profile,
-      assets: validVisibleAssets
+      assets: validVisibleAssets,
+      startYear: earliestYear // Use this instead of calculationStartYear
     };
 
-    // Run the calculation
+    // Run the calculation starting from earliest purchase year
     results = calculateForecast(calculationProfile, settings);
-    console.log({ results })
+    console.log({ results, earliestYear, currentYear: profile.currentYear });
 
-    // Update the chart and table
-    updateChart(results);
+    // Filter results for chart to show only current year and beyond
+    const currentYearIndex = results.findIndex(r => r.currentYear >= profile.currentYear);
+    const currentYearResults = currentYearIndex >= 0 ? results.slice(currentYearIndex) : results;
+
+    // Update the chart with filtered results (current year onward)
+    updateChart(currentYearResults);
+    
+    // Update the table with full historical results
     updateResultsTable(results);
   } catch (error) {
     console.error('Calculation error:', error);

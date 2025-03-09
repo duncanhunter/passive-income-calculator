@@ -225,6 +225,13 @@ h1 {
   font-size: 14px;
 }
 
+/* Add minimum width for the name column */
+.assets-table th:first-child,
+.assets-table td:first-child {
+  min-width: 200px;
+  width: auto;
+}
+
 .assets-table th {
   background-color: #e6e6e6;
   border: 1px solid #ccc;
@@ -234,6 +241,44 @@ h1 {
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+/* Loan header and cell styling */
+.assets-table th.loan-header {
+  background-color: #d8e6f3;
+  border-top: 2px solid #a4c4e3;
+  border-bottom: 2px solid #a4c4e3;
+}
+
+.assets-table th.loan-header:first-of-type {
+  border-left: 2px solid #a4c4e3;
+}
+
+.assets-table th.loan-header:last-of-type {
+  border-right: 2px solid #a4c4e3;
+}
+
+.assets-table td.loan-cell {
+  background-color: #f6f9fc;
+}
+
+/* Growth rate header and cell styling */
+.assets-table th.growth-header {
+  background-color: #e8f3e8;
+  border-top: 2px solid #a4e3a4;
+  border-bottom: 2px solid #a4e3a4;
+}
+
+.assets-table th.growth-header:first-of-type {
+  border-left: 2px solid #a4e3a4;
+}
+
+.assets-table th.growth-header:last-of-type {
+  border-right: 2px solid #a4e3a4;
+}
+
+.assets-table td.growth-cell {
+  background-color: #f4faf4;
 }
 
 .assets-table td {
