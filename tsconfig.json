@@ -12,6 +12,6 @@
     "skipLibCheck": true,
     "sourceMap": true
   },
-  "include": ["*.ts", "src/index.ts", "src/types.ts"],
+  "include": ["*.ts"],
   "exclude": ["node_modules"]
 }

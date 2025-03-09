@@ -44,7 +44,7 @@ export interface Asset {
 
     // Growth & Income
     capitalGrowthRate?: number;  // e.g. 0.05 => 5%
-    incomePerWeek?: number;      // e.g. 500
+    incomePerYear?: number;      // e.g. 500
     incomeGrowthRate?: number;   // e.g. 0.02 => 2%
     expensesPerYear?: number;    // e.g. 8000
     expenseGrowthRate?: number;  // e.g. 0.02 => 2%

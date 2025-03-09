@@ -1,13 +1,14 @@
 {
-  "name": "passive-income-goal-calculator",
+  "name": "passive-income-calculator",
   "version": "1.0.0",
   "description": "A calculator for passive income goals",
   "type": "module",
   "main": "dist/forecast-calculator.js",
+  "homepage": "https://duncanhunter.github.io/passive-income-calculator",
   "scripts": {
-    "start": "npm run build && serve",
-    "dev": "npm run build -- --watch & serve -l 3000",
-    "build": "esbuild src/forecast-calculator.ts --bundle --outdir=dist --format=esm"
+    "start": "serve",
+    "dev": "serve -l 3000",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -19,7 +20,6 @@
   },
   "devDependencies": {
     "@types/big.js": "^6.2.2",
-    "esbuild": "^0.19.11",
     "serve": "^14.2.0"
   }
 }

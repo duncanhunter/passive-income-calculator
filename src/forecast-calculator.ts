@@ -123,7 +123,7 @@ export function calculateForecast(
             capitalGrowthRate,
             // Support both incomePerYear and incomePerWeek for backwards compatibility
             incomePerYear: getOrDefaultNumber(
-                asset.incomePerYear || (asset.incomePerWeek ? asset.incomePerWeek * 52 : undefined),
+                asset.incomePerYear,
                 0
             ),
             incomeGrowthRate,
