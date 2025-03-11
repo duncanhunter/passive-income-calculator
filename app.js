@@ -529,10 +529,12 @@ function updateChart(forecastResults) {
 
   // Refined financial color palette with better contrast
   const colors = {
-    debt: "#E63946",        // Modern red for debt
-    equity: "#6EA8C0",      // Lighter blue for equity (was #457B9D)
-    income: "#D96704",      // Darker amber for income (was #F9C74F)
-    incomeHover: "#F3A712"  // Accent color for hover states
+    debt: "#E63946",
+    equity: "#6EA8C0",
+    income: "#D96704",
+    incomeNegative: "#D96704",
+    incomePositive: "green",
+    incomeHover: "#F3A712"
   };
 
   // Create new chart
@@ -565,7 +567,14 @@ function updateChart(forecastResults) {
           borderColor: colors.income,
           backgroundColor: colors.incomeHover,
           borderWidth: 3,
-          pointBackgroundColor: colors.income,
+          pointBackgroundColor: function (context) {
+            const value = context.raw;
+            return value >= 0 ? colors.incomePositive : colors.incomeNegative;
+          },
+          pointBorderColor: function (context) {
+            const value = context.raw;
+            return value >= 0 ? colors.incomePositive : colors.incomeNegative;
+          },
           pointRadius: 4,
           pointHoverRadius: 6,
           tension: 0.3,
@@ -576,6 +585,12 @@ function updateChart(forecastResults) {
           shadowOffsetY: 3,
           shadowBlur: 10,
           shadowColor: 'rgba(0, 0, 0, 0.2)',
+          segment: {
+            borderColor: context => {
+              const value = context.p1.parsed.y;
+              return value >= 0 ? colors.incomePositive : colors.incomeNegative;
+            }
+          },
         },
       ]
     },
